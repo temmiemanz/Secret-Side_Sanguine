@@ -681,7 +681,6 @@ body.editing .prof-label { display: inline; font-size: 9px; color: var(--muted);
    ══════════════════════════════════════════ */
 body { background: #0e0808; min-height: 100vh; }
 
-#egoCanvas { position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0; }
 .page { position:relative;z-index:1; }
 
 .card {
@@ -922,8 +921,6 @@ body { background: #0e0808; min-height: 100vh; }
 </style>
 </head>
 <body>
-
-<canvas id="egoCanvas"></canvas>
 
 <div class="page">
 
@@ -1222,7 +1219,7 @@ body { background: #0e0808; min-height: 100vh; }
             <div class="ego-ability"><div class="ego-ability-name">Rejoin</div><div class="ego-ability-desc">Either can return into Ego energy at will. Both can phase through each other selectively by choice.</div></div>
             <div class="ego-ability"><div class="ego-ability-name">Ego Link</div><div class="ego-ability-desc">While split, all memory and knowledge passes instantly between them. Everything except opinion.</div></div>
             <div class="ego-ability"><div class="ego-ability-name">Weightless</div><div class="ego-ability-desc">To each other: no physical weight or resistance. Contact bypasses all force.</div></div>
-            <div class="ego-ability"><div class="ego-ability-name">Detachment</div><div class="ego-ability-desc">Either can release limbs to the other's control — fully, immediately, no lag. Detached limbs have 1HP. One hit returns them with no consequence. Cooldown is DM discretion. <span class="ego-red">Damage still dealt to owner.</span></div></div>
+            <div class="ego-ability"><div class="ego-ability-name">Detachment</div><div class="ego-ability-desc">Either can release limbs to the other's control — fully, immediately, no lag. Detached limbs have 1HP. One hit returns them with no consequence to the owner. The limb cannot be re-detached until enough time has passed.</div></div>
             <div class="ego-ability"><div class="ego-ability-name">Resurrection</div><div class="ego-ability-desc">As long as Ego energy remains, the survivor can re-split the dead one back at 1HP. Not revival — splitting again. <span class="ego-red">Three times per full rest.</span></div></div>
           </div>
 
@@ -2312,163 +2309,7 @@ document.querySelectorAll('.locked-field').forEach(el => {
 document.querySelectorAll('.prof-val').forEach(el => {
   el.addEventListener('input', () => { refreshZeroHidden(); save(); });
 });
-// ── INKY & EGO — EGO ENERGY ANIMATION ──
-(function() {
-  const canvas = document.getElementById('egoCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H;
 
-  function resize() {
-    W = canvas.width  = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-    buildThreads();
-  }
-
-  let t = 0;
-
-  // ── GOLD THREADS — the Ego energy linking everything ──
-  // Each thread is a slow sinusoidal ribbon drifting across the screen
-  let threads = [];
-  function buildThreads() {
-    threads = Array.from({length: 14}, (_, i) => ({
-      // Anchor points that the ribbon flows between
-      ax:    Math.random() * W,
-      ay:    Math.random() * H,
-      bx:    Math.random() * W,
-      by:    Math.random() * H,
-      // Drift velocities
-      avx:   (Math.random() - 0.5) * 0.15,
-      avy:   (Math.random() - 0.5) * 0.08,
-      bvx:   (Math.random() - 0.5) * 0.15,
-      bvy:   (Math.random() - 0.5) * 0.08,
-      // Wave along the thread
-      wave:  0.3 + Math.random() * 0.7,
-      wfreq: 0.008 + Math.random() * 0.012,
-      phase: Math.random() * Math.PI * 2,
-      speed: 0.003 + Math.random() * 0.004,
-      alpha: 0.06 + Math.random() * 0.1,
-      width: 0.6 + Math.random() * 1.2,
-    }));
-  }
-
-  // ── GOLD MOTES — tiny drifting sparks ──
-  const motes = Array.from({length: 55}, () => ({
-    x:     Math.random() * 1920,
-    y:     Math.random() * 1080,
-    size:  0.5 + Math.random() * 1.4,
-    vx:    (Math.random() - 0.5) * 0.1,
-    vy:    (Math.random() - 0.5) * 0.06,
-    phase: Math.random() * Math.PI * 2,
-    alpha: 0.08 + Math.random() * 0.18,
-    pulse: Math.random() * Math.PI * 2,
-  }));
-
-  // ── CRIMSON EMBERS — rising from below ──
-  const embers = Array.from({length: 25}, () => ({
-    x:     Math.random() * 1920,
-    y:     Math.random() * 1080,
-    size:  0.5 + Math.random() * 1.5,
-    vx:    (Math.random() - 0.5) * 0.1,
-    vy:    -(0.04 + Math.random() * 0.14),
-    phase: Math.random() * Math.PI * 2,
-    alpha: 0.05 + Math.random() * 0.1,
-  }));
-
-  function drawThread(th) {
-    const steps = 60;
-    ctx.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const p  = i / steps;
-      // Lerp between anchor points
-      const bx = th.ax + (th.bx - th.ax) * p;
-      const by = th.ay + (th.by - th.ay) * p;
-      // Perpendicular offset for wave
-      const dx = th.bx - th.ax;
-      const dy = th.by - th.ay;
-      const len = Math.sqrt(dx*dx + dy*dy) || 1;
-      const nx = -dy / len;
-      const ny =  dx / len;
-      const wave = Math.sin(p * Math.PI * 3 * th.wfreq * 800 + t * th.speed * 200 + th.phase) * th.wave * 40;
-      const x = bx + nx * wave;
-      const y = by + ny * wave;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    // Gold gradient along thread
-    const grad = ctx.createLinearGradient(th.ax, th.ay, th.bx, th.by);
-    grad.addColorStop(0,    `rgba(212,168,50,0)`);
-    grad.addColorStop(0.25, `rgba(232,200,100,${th.alpha})`);
-    grad.addColorStop(0.5,  `rgba(212,168,50,${th.alpha * 1.4})`);
-    grad.addColorStop(0.75, `rgba(232,200,100,${th.alpha})`);
-    grad.addColorStop(1,    `rgba(212,168,50,0)`);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth   = th.width;
-    ctx.shadowColor = 'rgba(212,168,50,0.3)';
-    ctx.shadowBlur  = 4;
-    ctx.stroke();
-    ctx.shadowBlur  = 0;
-  }
-
-  resize();
-  window.addEventListener('resize', resize);
-
-  function frame() {
-    ctx.clearRect(0, 0, W, H);
-    t += 0.004;
-
-    // Background vignette
-    const cx = W * 0.5, cy = H * 0.5;
-    const bg = ctx.createRadialGradient(cx, cy*0.8, 0, cx, cy*0.8, Math.max(W,H)*0.9);
-    bg.addColorStop(0,   'rgba(25,6,6,0.4)');
-    bg.addColorStop(0.6, 'rgba(14,4,4,0.25)');
-    bg.addColorStop(1,   'rgba(0,0,0,0.55)');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    // Gold threads — move anchors slowly
-    threads.forEach(th => {
-      th.ax += th.avx; th.ay += th.avy;
-      th.bx += th.bvx; th.by += th.bvy;
-      // Bounce off edges softly
-      if (th.ax < -100 || th.ax > W+100) th.avx *= -1;
-      if (th.ay < -100 || th.ay > H+100) th.avy *= -1;
-      if (th.bx < -100 || th.bx > W+100) th.bvx *= -1;
-      if (th.by < -100 || th.by > H+100) th.bvy *= -1;
-      drawThread(th);
-    });
-
-    // Gold motes
-    motes.forEach(m => {
-      m.x += m.vx + Math.sin(t * 0.7 + m.phase) * 0.06;
-      m.y += m.vy + Math.cos(t * 0.5 + m.phase) * 0.04;
-      if (m.x < -10) m.x = W+10; if (m.x > W+10) m.x = -10;
-      if (m.y < -10) m.y = H+10; if (m.y > H+10) m.y = -10;
-      const p2 = 0.5 + 0.5 * Math.sin(t * 1.8 + m.pulse);
-      const g = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, m.size * 4);
-      g.addColorStop(0,   `rgba(232,200,100,${m.alpha * p2})`);
-      g.addColorStop(0.5, `rgba(212,168,50,${m.alpha * p2 * 0.4})`);
-      g.addColorStop(1,   'transparent');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(m.x, m.y, m.size * 4, 0, Math.PI*2); ctx.fill();
-    });
-
-    // Crimson embers rising
-    embers.forEach(e => {
-      e.x += e.vx + Math.sin(t * 0.9 + e.phase) * 0.07;
-      e.y += e.vy;
-      if (e.y < -10) { e.y = H+10; e.x = Math.random()*W; }
-      const p2 = 0.4 + 0.6 * Math.sin(t * 2.2 + e.phase);
-      const g = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, e.size * 3);
-      g.addColorStop(0,   `rgba(200,24,42,${e.alpha * p2})`);
-      g.addColorStop(1,   'transparent');
-      ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(e.x, e.y, e.size * 3, 0, Math.PI*2); ctx.fill();
-    });
-
-    requestAnimationFrame(frame);
-  }
-  frame();
-})();
 
 
 // ── REST TOAST — plain notification, no roll display ──
