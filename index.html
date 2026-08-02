@@ -2155,6 +2155,15 @@ function egoAdjustHp(who, dir) {
 }
 
 function egoToggleSplit() {
+  // Forbid merging if one is dead
+  if (egoIsSplit) {
+    var inkyHp = parseInt(document.getElementById('egoInkyHp').value) || 0;
+    var egoHp  = parseInt(document.getElementById('egoEgoHp').value)  || 0;
+    if (inkyHp <= 0 || egoHp <= 0) {
+      showRestToast('Cannot merge', (inkyHp <= 0 ? 'Inky' : 'Ego') + ' must be resurrected first');
+      return;
+    }
+  }
   egoIsSplit = !egoIsSplit;
   var btn       = document.getElementById('egoSplitBtn');
   var splitRows = document.getElementById('egoSplitRows');
