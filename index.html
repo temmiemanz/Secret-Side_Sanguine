@@ -898,6 +898,27 @@ body { background: #0e0808; min-height: 100vh; }
 }
 .ego-res-pip.on { background:var(--accent);border-color:var(--accent);box-shadow:0 0 6px rgba(200,24,42,0.5); }
 
+
+/* REST BUTTONS */
+.rest-row {
+  display: flex; gap: 6px; align-items: center;
+}
+.rest-btn {
+  font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+  text-transform: uppercase; padding: 4px 10px;
+  border: 1px solid var(--border2); background: none;
+  color: var(--muted); border-radius: var(--radius);
+  cursor: pointer; transition: all var(--transition);
+  font-family: var(--font-display, var(--font-main));
+  white-space: nowrap;
+}
+.rest-btn.short:hover { border-color: var(--accent); color: var(--accent); }
+.rest-btn.long:hover  { border-color: var(--green);  color: var(--green); }
+
+
+.rest-toast { display: flex; flex-direction: column; gap: 2px; }
+.rest-toast-detail { font-size: 11px; color: var(--dim); }
+
 </style>
 </head>
 <body>
@@ -906,6 +927,11 @@ body { background: #0e0808; min-height: 100vh; }
 
 <div class="page">
 
+  <div class="rest-row">
+    <button class="rest-btn short" onclick="doShortRest()">Short Rest</button>
+    <button class="rest-btn long"  onclick="doLongRest()">Long Rest</button>
+  </div>
+
   <!-- WARNING -->
   <div style="text-align:center;font-size:10px;color:var(--muted);letter-spacing:0.04em;padding:2px 0 4px;">
     Please try to roll with a real dice, these online rolls are untrustworthy and are a last resort!
@@ -913,7 +939,7 @@ body { background: #0e0808; min-height: 100vh; }
 
   <!-- EDIT BAR -->
   <div class="edit-bar">
-    <button class="edit-btn" id="editBtn" onclick="toggleEdit()">Edit</button>
+    
   </div>
 
   <!-- HEADER -->
@@ -947,21 +973,19 @@ body { background: #0e0808; min-height: 100vh; }
       </div>
 
       <div class="hp-widget">
-        <div class="hp-row-top">
-          <span class="hp-label">HP</span>
-          <div class="hp-display">
-            <button class="hp-ctrl-btn dmg"  onclick="adjustHp(-1)">−</button>
-            <input  class="hp-amt" type="number" id="hpAmount" value="1" min="1">
-            <button class="hp-ctrl-btn heal" onclick="adjustHp(1)">+</button>
-            <input class="hp-num locked-field" type="number" id="currentHp" placeholder="—" oninput="clampHp(); save()">
-            <span class="hp-slash">/</span>
-            <input class="hp-num locked-field" type="number" id="maxHp" placeholder="—" oninput="save()">
-            <span class="hp-flash" id="hpFlash"></span>
+        <!-- Hidden inputs kept for system compatibility -->
+        <input type="hidden" id="currentHp" value="11">
+        <input type="hidden" id="maxHp" value="11">
+        <input type="hidden" id="hpAmount" value="1">
+        <span id="hpFlash"></span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;height:100%;justify-content:space-between;">
+          <div style="font-size:10px;color:var(--muted);font-style:italic;text-align:right;letter-spacing:0.04em;line-height:1.5;">
+            HP tracked<br>in Ability tab
           </div>
-        </div>
-        <div class="level-row">
-          <span class="level-label">LVL</span>
-          <input class="level-val locked-field" type="number" id="levelVal" placeholder="1" min="1">
+          <div class="level-row">
+            <span class="level-label">LVL</span>
+            <input class="level-val locked-field" type="number" id="levelVal" placeholder="1" min="1">
+          </div>
         </div>
       </div>
 
@@ -2383,6 +2407,75 @@ document.querySelectorAll('.prof-val').forEach(el => {
   }
   frame();
 })();
+
+
+// ── REST TOAST — plain notification, no roll display ──
+function showRestToast(title, detail) {
+  const stack = document.getElementById('toastStack');
+  if (!stack) return;
+  const el = document.createElement('div');
+  el.className = 'toast-item rest-toast';
+  el.innerHTML = '<span class="toast-label">' + title + '</span>' +
+                 (detail ? '<span class="rest-toast-detail">' + detail + '</span>' : '');
+  stack.appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 400); }, 3000);
+}
+
+// ── REST SYSTEM ──
+function doShortRest() {
+  var msg = '';
+  if (!egoIsSplit && egoResUses < 3) {
+    egoResUses++;
+    [0,1,2].forEach(function(i) {
+      var p = document.getElementById('egoPip'+i);
+      if (p) p.classList.toggle('on', i < egoResUses);
+    });
+    egoSave();
+    msg = '+1 resurrection pip';
+  }
+  if (egoIsSplit) {
+    ['InkyHp','EgoHp'].forEach(function(id) {
+      var el  = document.getElementById('ego'+id);
+      var mel = document.getElementById('ego'+id.replace('Hp','Max'));
+      if (!el||!mel) return;
+      var cur = parseInt(el.value)||0;
+      var max = parseInt(mel.value)||cur;
+      el.value = Math.min(max, cur + Math.min(cur, max-cur));
+    });
+    egoSave();
+  } else {
+    var hp  = document.getElementById('egoMergedHp');
+    var mhp = document.getElementById('egoMergedMax');
+    if (hp && mhp) {
+      var cur = parseInt(hp.value)||0;
+      var max = parseInt(mhp.value)||cur;
+      hp.value = Math.min(max, cur + Math.min(cur, max-cur));
+    }
+    egoSave();
+  }
+  showRestToast('Short Rest', msg || 'HP restored');
+}
+
+function doLongRest() {
+  egoResUses = 3;
+  [0,1,2].forEach(function(i) {
+    var p = document.getElementById('egoPip'+i);
+    if (p) p.classList.add('on');
+  });
+  egoSave();
+  if (egoIsSplit) {
+    var im = document.getElementById('egoInkyMax');
+    var em = document.getElementById('egoEgoMax');
+    if (im) document.getElementById('egoInkyHp').value = im.value;
+    if (em) document.getElementById('egoEgoHp').value  = em.value;
+  } else {
+    var m = document.getElementById('egoMergedMax');
+    if (m) document.getElementById('egoMergedHp').value = m.value;
+  }
+  egoSave();
+  dsClear();
+  showRestToast('Long Rest', 'Fully restored · Pips reset');
+}
 
 </script>
 
