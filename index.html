@@ -2096,9 +2096,14 @@ function defaultActions() {
 
 // ── DEATH SAVES ──
 setInterval(function() {
-  var hp  = document.getElementById('currentHp').value;
   var box = document.getElementById('deathSaves');
   if (!box) return;
+  // Use merged HP when together, hide death saves entirely when split
+  if (egoIsSplit) {
+    box.classList.remove('on');
+    return;
+  }
+  var hp = document.getElementById('egoMergedHp').value;
   if (hp === '0') { box.classList.add('on'); }
   else            { box.classList.remove('on'); }
 }, 500);
@@ -2155,8 +2160,15 @@ function egoAdjustHp(who, dir) {
 }
 
 function egoToggleSplit() {
-  // Forbid merging if one is dead
-  if (egoIsSplit) {
+  if (!egoIsSplit) {
+    // Forbid splitting when merged HP is 0
+    var mergedHp = parseInt(document.getElementById('egoMergedHp').value) || 0;
+    if (mergedHp <= 0) {
+      showRestToast('Cannot split', 'Inky & Ego must be conscious to split');
+      return;
+    }
+  } else {
+    // Forbid merging if one is dead
     var inkyHp = parseInt(document.getElementById('egoInkyHp').value) || 0;
     var egoHp  = parseInt(document.getElementById('egoEgoHp').value)  || 0;
     if (inkyHp <= 0 || egoHp <= 0) {
