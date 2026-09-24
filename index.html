@@ -3182,33 +3182,85 @@ function invCheckIncomingItem() {
   history.replaceState(null, '', location.pathname + location.search);
 }
 
-// ── RECEIVE ITEM VIA MAILBOX (main path: fully automatic, no action needed) ──
+// ── RECEIVE ITEM/COMMANDS VIA MAILBOX (main path: fully automatic, no action needed) ──
 // A tiny items-mailbox.json file sits alongside this sheet in the same repo.
-// The DM can drop an item into it from anywhere (phone, GitHub's own site,
-// the sender tool) with zero cooperation from this sheet's owner — the next
-// time this page is open or reloaded, anything new in the mailbox is pulled
-// in automatically. Already-applied items are tracked so nothing repeats.
+// The DM can drop an item, or a stat/level/HP/AC change, or a removal request
+// into it from anywhere (phone, GitHub's own site, the DM screen tool) with
+// zero cooperation from this sheet's owner — the next time this page is open
+// or reloaded, anything new in the mailbox is applied automatically.
+// Already-applied entries are tracked so nothing repeats.
+function invApplyDMCommand(cmd) {
+  if (cmd.type === 'setStat' && ['str','mnd','sol','def'].indexOf(cmd.stat) !== -1) {
+    var el = document.getElementById(cmd.stat + 'Val');
+    if (el) { el.value = cmd.value; updateStat(cmd.stat); }
+    return 'Set ' + cmd.stat.toUpperCase() + ' to ' + cmd.value;
+  }
+  if (cmd.type === 'setLevel') {
+    var lv = document.getElementById('levelVal');
+    if (lv) lv.value = cmd.value;
+    return 'Set Level to ' + cmd.value;
+  }
+  if (cmd.type === 'setHp') {
+    var cur = document.getElementById('currentHp'), max = document.getElementById('maxHp');
+    if (cmd.current !== undefined && cur) cur.value = cmd.current;
+    if (cmd.max !== undefined && max) max.value = cmd.max;
+    if (typeof clampHp === 'function') clampHp();
+    return 'Set HP to ' + cmd.current + '/' + cmd.max;
+  }
+  if (cmd.type === 'setAC') {
+    var ac = document.getElementById('acVal');
+    if (ac) ac.value = cmd.value;
+    if (typeof updateACDisplay === 'function') updateACDisplay();
+    return 'Set AC override to ' + cmd.value;
+  }
+  if (cmd.type === 'removeItem') {
+    var target = (cmd.itemName || '').trim().toLowerCase();
+    var idx = invItems.findIndex(function(i){ return (i.name||'').trim().toLowerCase() === target; });
+    if (idx !== -1) {
+      var removed = invItems[idx];
+      invEquipped.weaponIds = invEquipped.weaponIds.filter(function(id){ return id !== removed.id; });
+      if (invEquipped.armorId === removed.id) invEquipped.armorId = null;
+      invEquipped.otherIds = (invEquipped.otherIds||[]).filter(function(id){ return id !== removed.id; });
+      invItems.splice(idx, 1);
+      return 'Removed ' + removed.name;
+    }
+    return null;
+  }
+  return null;
+}
 function invCheckMailbox() {
   var seenKey = SAVE_KEY + '_mailbox_seen';
   var seen; try { seen = JSON.parse(localStorage.getItem(seenKey)) || []; } catch(e) { seen = []; }
   fetch('./items-mailbox.json?_=' + Date.now())
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){
-      if (!data || !data.items || !data.items.length) return;
-      var added = [];
-      data.items.forEach(function(entry){
+      if (!data) return;
+      var notes = [];
+      var invTouched = false, sheetTouched = false;
+
+      (data.items || []).forEach(function(entry){
         if (!entry.mailId || seen.indexOf(entry.mailId) !== -1) return;
         var item = JSON.parse(JSON.stringify(entry));
         delete item.mailId;
         item.id = 'i' + Date.now() + Math.floor(Math.random()*1000);
         invItems.push(item);
         seen.push(entry.mailId);
-        added.push(item.name);
+        notes.push(item.name);
+        invTouched = true;
       });
-      if (added.length) {
-        invSave(); invRender(); invApplyPassives();
+
+      (data.commands || []).forEach(function(cmd){
+        if (!cmd.cmdId || seen.indexOf(cmd.cmdId) !== -1) return;
+        seen.push(cmd.cmdId);
+        var result = invApplyDMCommand(cmd);
+        if (result) { notes.push(result); sheetTouched = true; if (cmd.type === 'removeItem') invTouched = true; }
+      });
+
+      if (invTouched) { invSave(); invRender(); invApplyPassives(); }
+      if (sheetTouched) { save(); }
+      if (notes.length) {
         try { localStorage.setItem(seenKey, JSON.stringify(seen)); } catch(e) {}
-        showRestToast('Item' + (added.length>1?'s':'') + ' Received', added.join(', '));
+        showRestToast('From the DM', notes.join(', '));
       }
     })
     .catch(function(){ /* offline, no mailbox file yet, or not on GitHub Pages — fine, just skip */ });
