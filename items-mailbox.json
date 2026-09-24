@@ -1,0 +1,49 @@
+{
+  "items": [
+    {
+      "mailId": "m17902575968775446",
+      "name": "Dagger",
+      "type": "Weapon",
+      "rarity": "Common",
+      "value": "",
+      "weight": "1",
+      "qty": 1,
+      "stackable": false,
+      "desc": "test weapon",
+      "notes": "",
+      "equippable": true,
+      "usable": false,
+      "consumable": false,
+      "uses": "",
+      "props": "Finesse, Light, Thrown",
+      "weaponWt": "Light",
+      "twoHanded": false,
+      "ac": "",
+      "armorType": "Light",
+      "strReq": "",
+      "stealthDisadv": false,
+      "ammoDamage": "",
+      "ammoDmgType": "",
+      "effect": "",
+      "fx": {
+        "str": "",
+        "mnd": "",
+        "sol": "",
+        "def": ""
+      },
+      "conditions": [],
+      "customFields": [],
+      "actions": [
+        {
+          "name": "Dagger",
+          "damage": "1d4",
+          "dmgType": "Piercing",
+          "range": "20/60 ft",
+          "damage2": "",
+          "dmgType2": "",
+          "notes": ""
+        }
+      ]
+    }
+  ]
+}
