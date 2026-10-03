@@ -1412,10 +1412,10 @@ body { background: #0e0808; min-height: 100vh; }
 
           <div>
             <div class="ars-title">Arsenal — Embodiment EGG</div>
-            <div class="ars-sub">Sanguine "Tre"</div>
+            <div class="ars-sub">Sanguine</div>
           </div>
 
-          <p class="ars-desc">Tre doesn't carry weapons so much as he carries the idea of them. If he can convince the world, and the DM, that something is really his, he can pull a weapon straight out of it.</p>
+          <p class="ars-desc">Sanguine doesn't carry weapons so much as he carries the idea of them. If he can convince the world, and the DM, that something is really his, he can pull a weapon straight out of it.</p>
 
           <div class="ars-divider"></div>
 
@@ -1434,7 +1434,7 @@ body { background: #0e0808; min-height: 100vh; }
           <div class="ars-divider"></div>
 
           <div class="ars-section">Arsenal</div>
-          <p class="ars-desc">If Tre can convince the DM, in the moment, that he owns an object he could lift entirely on his own, no help, no magic, no assist, he can turn it into a weapon. He picks what he wants it to become, then rolls a d20:</p>
+          <p class="ars-desc">If Sanguine can convince the DM, in the moment, that he owns an object he could lift entirely on his own, no help, no magic, no assist, he can turn it into a weapon. He picks what he wants it to become, then rolls a d20:</p>
           <div class="ars-table">
             <div class="ars-table-row"><span class="ars-table-roll">1</span><span>Nothing happens</span></div>
             <div class="ars-table-row"><span class="ars-table-roll">2–5</span><span>A random, weaker weapon</span></div>
@@ -1458,9 +1458,9 @@ body { background: #0e0808; min-height: 100vh; }
 
           <div class="ars-section">Limits</div>
           <div class="ars-limits">
-            <div class="ars-limit">The object has to be liftable by Tre alone, with no outside help of any kind.</div>
+            <div class="ars-limit">The object has to be liftable by Sanguine alone, with no outside help of any kind.</div>
             <div class="ars-limit">A weapon keeps the weight of whatever it came from, and sometimes the size too.</div>
-            <div class="ars-limit">Anyone but Tre using one of these weapons fights at disadvantage, always.</div>
+            <div class="ars-limit">Anyone but Sanguine using one of these weapons fights at disadvantage, always.</div>
             <div class="ars-limit">Only 3 weapons can sit in the Rack at once. A 4th means dropping one first.</div>
             <div class="ars-limit">He has to sell the DM on ownership before he even attempts the transformation.</div>
             <div class="ars-limit">Rolling a 1 wastes the attempt entirely. No weapon, no refund.</div>
@@ -3227,6 +3227,11 @@ function invApplyDMCommand(cmd) {
     if (ac) ac.value = cmd.value;
     if (typeof updateACDisplay === 'function') updateACDisplay();
     return 'Set AC override to ' + cmd.value;
+  }
+  if (cmd.type === 'setAbilityName') {
+    var abName = document.getElementById('abilityName');
+    if (abName) abName.value = cmd.value;
+    return 'Set Ability Name to ' + cmd.value;
   }
   if (cmd.type === 'removeItem') {
     var target = (cmd.itemName || '').trim().toLowerCase();
