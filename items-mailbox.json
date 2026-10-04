@@ -44,6 +44,51 @@
           "notes": "Explodes in a burst — everyone caught in the blast takes damage, not just the target."
         }
       ]
+    },
+    {
+      "mailId": "m1791146212086678",
+      "name": "Machete",
+      "type": "Weapon",
+      "rarity": "Common",
+      "value": "",
+      "weight": "2",
+      "qty": 1,
+      "stackable": false,
+      "desc": "",
+      "notes": "",
+      "equippable": true,
+      "usable": false,
+      "consumable": false,
+      "uses": "",
+      "props": "Light",
+      "weaponWt": "Light",
+      "twoHanded": false,
+      "ac": "",
+      "armorType": "Light",
+      "strReq": "",
+      "stealthDisadv": false,
+      "ammoDamage": "",
+      "ammoDmgType": "",
+      "effect": "",
+      "fx": {
+        "str": "",
+        "mnd": "",
+        "sol": "",
+        "def": ""
+      },
+      "conditions": [],
+      "customFields": [],
+      "actions": [
+        {
+          "name": "Machete",
+          "damage": "1d6",
+          "dmgType": "Slashing",
+          "range": "5 ft",
+          "damage2": "",
+          "dmgType2": "",
+          "notes": ""
+        }
+      ]
     }
   ],
   "commands": [
