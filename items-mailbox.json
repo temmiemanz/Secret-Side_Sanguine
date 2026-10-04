@@ -89,6 +89,51 @@
           "notes": ""
         }
       ]
+    },
+    {
+      "mailId": "m17911474801877162",
+      "name": "Blood Dual Heavy Weapon",
+      "type": "Weapon",
+      "rarity": "Unique",
+      "value": "",
+      "weight": "50",
+      "qty": 1,
+      "stackable": false,
+      "desc": "A large dual sided weapon that can form any melee weapon on both ends",
+      "notes": "",
+      "equippable": true,
+      "usable": false,
+      "consumable": false,
+      "uses": "",
+      "props": "Heavy",
+      "weaponWt": "Heavy",
+      "twoHanded": false,
+      "ac": "",
+      "armorType": "Light",
+      "strReq": "",
+      "stealthDisadv": false,
+      "ammoDamage": "",
+      "ammoDmgType": "",
+      "effect": "",
+      "fx": {
+        "str": "",
+        "mnd": "",
+        "sol": "",
+        "def": ""
+      },
+      "conditions": [],
+      "customFields": [],
+      "actions": [
+        {
+          "name": "Attack",
+          "damage": "3d6 + STR",
+          "dmgType": "",
+          "range": "10ft",
+          "damage2": "",
+          "dmgType2": "",
+          "notes": "The attack of whatever it is made into"
+        }
+      ]
     }
   ],
   "commands": [
