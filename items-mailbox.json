@@ -1,5 +1,51 @@
 {
-  "items": [],
+  "items": [
+    {
+      "mailId": "m17911442474206851",
+      "name": "Frag Grenade",
+      "type": "Weapon",
+      "rarity": "Common",
+      "value": "",
+      "weight": "1",
+      "qty": 1,
+      "stackable": false,
+      "desc": "",
+      "notes": "",
+      "equippable": true,
+      "usable": false,
+      "consumable": false,
+      "uses": "",
+      "props": "Thrown, Special",
+      "weaponWt": "Thrown",
+      "twoHanded": false,
+      "ac": "",
+      "armorType": "Light",
+      "strReq": "",
+      "stealthDisadv": false,
+      "ammoDamage": "",
+      "ammoDmgType": "",
+      "effect": "",
+      "fx": {
+        "str": "",
+        "mnd": "",
+        "sol": "",
+        "def": ""
+      },
+      "conditions": [],
+      "customFields": [],
+      "actions": [
+        {
+          "name": "Frag Grenade",
+          "damage": "4d6",
+          "dmgType": "Solid",
+          "range": "30/60 ft",
+          "damage2": "",
+          "dmgType2": "",
+          "notes": "Explodes in a burst — everyone caught in the blast takes damage, not just the target."
+        }
+      ]
+    }
+  ],
   "commands": [
     {
       "cmdId": "c17909588500813704-Secret-Side_Sanguine",
