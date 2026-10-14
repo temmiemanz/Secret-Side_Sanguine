@@ -134,6 +134,69 @@
           "notes": "The attack of whatever it is made into"
         }
       ]
+    },
+    {
+      "mailId": "m17919826898194800",
+      "name": "Ironjaw",
+      "type": "Weapon",
+      "rarity": "Unique",
+      "value": "",
+      "weight": "15",
+      "qty": 1,
+      "stackable": false,
+      "desc": "Half a valve cover, dented and black with old oil, still showing the bolt holes where it sat on an engine. A steel piston runs from the bracer to the knuckles with a coil spring wrapped around it. The fist is a plate of bare iron over the knuckles, so the fingers stay free. A stubby gun under the wrist spits out a cracked black serpentine belt that wraps whatever it touches and tightens until Sanguine lets go. Nothing has ever scratched it.",
+      "notes": "",
+      "equippable": true,
+      "usable": false,
+      "consumable": false,
+      "uses": "",
+      "props": "Indestructible, Grapple, Reach",
+      "weaponWt": "Heavy",
+      "twoHanded": true,
+      "ac": "",
+      "armorType": "Light",
+      "strReq": "",
+      "stealthDisadv": false,
+      "ammoDamage": "",
+      "ammoDmgType": "",
+      "effect": "",
+      "fx": {
+        "str": "",
+        "mnd": "",
+        "sol": "",
+        "def": ""
+      },
+      "conditions": [],
+      "customFields": [],
+      "actions": [
+        {
+          "name": "Piston Punch",
+          "damage": "1d6+STR",
+          "dmgType": "Bludgeoning",
+          "range": "5ft",
+          "damage2": "1d6",
+          "dmgType2": "Bludgeoning",
+          "notes": "The piston fires on hit. Every hit lands twice."
+        },
+        {
+          "name": "Belt Shot",
+          "damage": "0",
+          "dmgType": "",
+          "range": "180ft",
+          "damage2": "",
+          "dmgType2": "",
+          "notes": "Needs an object capable of being wrapped otherwise just shoots a belt that does nothing."
+        },
+        {
+          "name": "Reel in",
+          "damage": "",
+          "dmgType": "",
+          "range": "180ft",
+          "damage2": "",
+          "dmgType2": "",
+          "notes": "Needs a wrapped target. Tre either pulls himself to the target or drags the target to him. If he pulls himself in, he can Piston Punch as part of the same action."
+        }
+      ]
     }
   ],
   "commands": [
